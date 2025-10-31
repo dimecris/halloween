@@ -48,14 +48,14 @@ p5-Halloween/
 4. **Partículas Halloween**: Sistema dinámico con colores temáticos
 5. **Texto 3D interactivo**: Rotación basada en posición del mouse
 
-## 🔧 Instalación y Uso
+## Instalación y Uso
 
 1. Clonar el repositorio
 2. Abrir `index.html` en un navegador moderno
 3. Permitir acceso a la cámara cuando se solicite
 4. ¡Abrir la boca para ver los efectos Halloween!
 
-## 🎓 Proyecto Académico
+## Proyecto Académico
 
 Desarrollado como parte del trabajo de la asignatura de Multimedia del Grado en Multimedia de la UOC. 
 Enfoque en programación creativa con p5.js y tecnologías web modernas.
@@ -66,10 +66,10 @@ Enfoque en programación creativa con p5.js y tecnologías web modernas.
 - Integrar audio y visuales de forma coherente
 - Aplicar principios de diseño de interfaz responsiva
 
-## 📄 Licencia
+## Licencia
 
 Licencia MIT - Libre uso para fines educativos
 
 ---
 
-**Desarrollado en Halloween 2025** 🎃👻
+**Desarrollado en Halloween 2025** 

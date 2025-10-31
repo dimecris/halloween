@@ -1,0 +1,37 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Evitar scroll */
+}
+
+canvas {
+  display: block;
+  max-width: 100vw;
+  max-height: 100vh;
+  object-fit: cover; /* Mantener proporción */
+}
+
+/* Estilos para el botón de cámara */
+.camera-button {
+  position: absolute;
+  border: none;
+  border-radius: 0px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1000;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.camera-button.stop {
+  background-color: #ff6b35; /* Naranja para parar */
+}
+
+.camera-button.start {
+  background-color: #4CAF50; /* Verde para comenzar */
+}
+
+.camera-button:hover {
+  opacity: 0.8;
+}

@@ -1,0 +1,27 @@
+# Ignorar la carpeta de configuración de VS Code
+.vscode/
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de backups
+*.bak
+*.tmp
+
+# Excluir archivos de asistencia AI del repositorio público
+.github/copilot-instructions.md
+copilot-instructions.md
+**/*copilot*.md
+**/*instructions*.md
+
+# Logs y archivos temporales
+*.log
+node_modules/
+
+# Archivos de audio grandes (usar versiones más pequeñas o enlaces)
+music/*.wav
+music/*.mp3
+music/halloween-ghost.wav
+
+
