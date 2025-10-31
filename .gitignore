@@ -19,9 +19,6 @@ copilot-instructions.md
 *.log
 node_modules/
 
-# Archivos de audio grandes (usar versiones más pequeñas o enlaces)
-music/*.wav
-music/*.mp3
-music/halloween-ghost.wav
+
 
 
