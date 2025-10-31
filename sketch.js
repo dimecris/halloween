@@ -49,7 +49,7 @@ async function setup() {
   blockFont = await loadFont("fonts/Scary-Halloween-Font.ttf");
   defaultFont = await loadFont("fonts/TiltWarp-Regular-VariableFont_XROT,YROT.ttf");
   try {
-    sonido = await loadSound("music/halloween-ghost.wav");
+    sonido = await loadSound("music/halloween-ghost.mp3");
     console.log('[audio] loaded successfully');
   } catch (e) {
     console.warn('[audio] failed to load', e);
