@@ -12,7 +12,7 @@ Proyecto interactivo de Halloween que utiliza detección facial con MediaPipe y 
 
 ## Demo en Vivo
 
-[Ver proyecto en vivo](https://dimecris.github.io/halloween)
+[Ver proyecto en vivo]( https://dimecris.github.io/halloween/)
 
 ## Tecnologías
 
@@ -21,7 +21,7 @@ Proyecto interactivo de Halloween que utiliza detección facial con MediaPipe y 
 - p5.sound
 - HTML5 Canvas & WebGL
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```
 p5-Halloween/
@@ -40,7 +40,7 @@ p5-Halloween/
 - **Movimiento del mouse** → Rota el texto 3D
 - **Barra espaciadora** → Simular boca abierta (modo fallback)
 
-## � Funcionamiento
+## Funcionamiento
 
 1. **Carga inicial**: Se configura la cámara y MediaPipe
 2. **Detección facial**: Análisis en tiempo real de landmarks faciales

@@ -19,6 +19,7 @@ let isMediaPipeReady = false;
 let lastVideoTime = -1;
 let jawOpen = false;
 let jawOpenThreshold = 0.05; // Umbral para detectar boca abierta
+let jawOpenValue = 0;
 
 // Texto 3D variables
 let blockFont;
@@ -39,6 +40,7 @@ const COLORS = {
   UI_START: [34, 139, 34],    // Verde botón comenzar
   UI_STOP: [255, 69, 0],      // Rojo-naranja botón parar
 };
+
 
 // setup() function - Initialization, runs once at start
 async function setup() {
@@ -176,19 +178,20 @@ function draw() {
   drawParticles();
 
   // Interacciones del mouse para rotar el texto 3D
-  rotY = map(mouseX, 0, width, -PI, PI);
-  rotX = map(mouseY, 0, height, -PI, PI);
+  rotY = map(jawOpenValue, 0, 0.9, 0, PI * 0.25); 
+  rotX = map(jawOpenValue, 0, 0.9, 0, PI * 0.15);
 
   // Dibujamos el texto 3D Halloween
   if (blockText) {
     push();
-    translate(0, 40);
+    translate(0, newVideoHeight/2 + 100);
     rotateX(rotX);  
     rotateY(rotY);
 
     // Cambiamos el color del texto según el estado de la boca
     jawOpen ? fill(...COLORS.GREEN) : fill(...COLORS.WHITE);
     model(blockText);
+    //console.log(jawOpenValue);
     pop();
   }
 }
@@ -208,7 +211,7 @@ function detectFaceAndJaw() {
         
         for (let i = 0; i < blendshapes.length; i++) {
           if (blendshapes[i].categoryName === 'jawOpen') {
-            const jawOpenValue = blendshapes[i].score;
+            jawOpenValue = blendshapes[i].score;
             jawOpen = jawOpenValue > jawOpenThreshold;
             break;
           }
@@ -251,13 +254,7 @@ function toggleCamera() {
     button.style('background-color', `rgb(${COLORS.UI_START.join(',')})`);
   }
 }
-
-// windowResized() function - Canvas responsivo
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
-// FUNCIÓN PARA CREAR PARTÍCULAS HALLOWEEN DESDE LA BOCA
+// FUNCIÓN PARA CREAR PARTÍCULAS HALLOWEEN
 function createHalloweenParticles(mouthX, mouthY) {
   if (particles.length < maxParticles) {
     // Usamos coordenadas exactas de la boca con pequeña variación aleatoria
@@ -265,24 +262,54 @@ function createHalloweenParticles(mouthX, mouthY) {
     let y = mouthY + random(-10, 10);
     
     // Seleccionamos colores Halloween que hemos definido
-    let colors = ['#FF4500', '#FF8C00', '#8B0000', '#9932CC', '#FF1493'];
-    let color = random(colors);
+    let color = random(Object.values(COLORS));
     
-    // Creamos partícula con tipo aleatorio
+    // Tamaño basado en apertura de boca
+    let particleSize = map(jawOpenValue, 0, 1, 5, 55) ;
+  
+    
+    // Vida útil más larga cuando la boca está más abierta
+    let lifespan = map(jawOpenValue, 0, 1, 40, 100);
+    
     let type = random(['spark', 'brush']);
-    let particle = new Particle(x, y, random(8, 15), color, random(60, 120), type);
+    let particle = new Particle(x, y, particleSize, color, lifespan, type);
+    
+    // Propiedades para control de opacidad
+    particle.alpha = 255;
+    particle.maxLife = lifespan; // Guardar vida inicial para cálculos
     
     particles.push(particle);
   }
 }
 
-// FUNCIÓN PARA ACTUALIZAR PARTÍCULAS
+// FUNCIÓN PARA ACTUALIZAR PARTÍCULAS - Transición más suave
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     particles[i].update();
     
-    // Eliminamos partículas muertas o que han salido de pantalla
-    if (particles[i].life <= 0 || particles[i].y > height + 50) {
+    // Control de opacidad basado en estado de la boca
+    if (!jawOpen) {
+      // Boca cerrada: desvanecimiento gradual (valor más bajo para transición lenta)
+      particles[i].alpha = lerp(particles[i].alpha, 0, 0.03); // Cambiar de 0.08 a 0.03
+      particles[i].life -= 1; // Muerte más lenta (cambiar de 3 a 1)
+      
+      // Efecto adicional: las partículas se mueven más lento
+      particles[i].vx *= 0.98; // Más gradual (cambiar de 0.95 a 0.98)
+      particles[i].vy *= 0.98;
+      
+    } else {
+      // Boca abierta: opacidad completa pero transición más suave
+      particles[i].alpha = lerp(particles[i].alpha, 255, 0.08); // Cambiar de 0.15 a 0.08
+    }
+    
+    // Desvanecimiento natural por edad (independiente del estado de boca)
+    let ageOpacity = map(particles[i].life, 0, particles[i].maxLife || 100, 0, 255);
+    particles[i].alpha = Math.min(particles[i].alpha, ageOpacity);
+    
+    // Eliminamos partículas muertas, fuera de pantalla o invisibles
+    if (particles[i].life <= 0 || 
+        particles[i].y > height + 50 || 
+        particles[i].alpha < 1) { // Cambiar de 3 a 1 para más gradual
       particles.splice(i, 1);
     }
   }
@@ -294,4 +321,10 @@ function drawParticles() {
     particle.draw();
   }
 }
+
+// windowResized() function - Canvas responsivo
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
 

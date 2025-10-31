@@ -12,6 +12,7 @@ class Particle {
     this.type = type;                                        // 'spark' o 'brush'
     this.angle = random(TWO_PI);                             // orientación inicial
     this.spin = random(-0.1, 0.1);                           // giro por frame
+    this.alpha = 255;                                       // Añadir propiedad alpha
   }
   update() {
     this.pos.add(this.vel);                  // avanza
@@ -27,10 +28,15 @@ class Particle {
     
   // Salvaguarda por si color se hubiese perdido: reconstruyo p5.Color si hace falta
   const col = (this.color && this.color.levels) ? this.color : color(this.color || '#FF8A00');
+    // Aplicamos la opacidad basada en alpha
+    let r = red(col);
+    let g = green(col);
+    let b = blue(col);
+    fill(r, g, b, this.alpha); // Usamos alpha para transparencia
+    
     if (this.type === 'spark') {
       // chispa circular con alpha que decae con la edad
       const a = map(this.age, 0, this.life, 255, 0);
-      fill(red(col), green(col), blue(col), a);
       ellipse(0, 0, this.size);
     } else if (this.type === 'brush') {
       // brochazo rectangular con bordes redondeados
