@@ -4,9 +4,9 @@ class Particle {
     this.vel = p5.Vector.random2D().mult(random(0.3, 5.5));  // velocidad inicial
     if (type === 'brush') this.vel.mult(0.6);                // brochazo = movimiento más suave
     this.size = size * random(0.6, 1.4);                     // tamaño con ligera variación
-  // Aseguro un p5.Color válido sin depender de ensureP5Color
+  // Aseguro un p5.Color válido
   // Si ya viene un p5.Color (tiene .levels), lo uso; si no, convierto o aplico un fallback
-  this.color = (col && col.levels) ? col : color(col || '#FF8A00');
+    this.color = (col && col.levels) ? col : color(col || '#FF8A00');
     this.life = life;                                        // vida total en frames
     this.age = 0;                                            // edad en frames
     this.type = type;                                        // 'spark' o 'brush'
@@ -14,11 +14,11 @@ class Particle {
     this.spin = random(-0.1, 0.1);                           // giro por frame
     this.alpha = 255;
     
-    // Propiedades para física de acumulación siguiendo las convenciones del proyecto
+    // Propiedades para física de acumulación
     this.gravity = 0.1;        // Fuerza de gravedad
     this.bounce = 0.3;         // Factor de rebote
     this.friction = 0.95;      // Fricción en el suelo
-    this.isGrounded = false;   // Si está en el suelo// Añadir propiedad alpha
+    this.isGrounded = false;   // Si está en el suelo
   }
   update() {
     if (this.life > 0) {
@@ -51,7 +51,7 @@ class Particle {
   draw() {
     push();
     
-    // Aplicar transparencia usando la paleta de colores Halloween
+    // Aplicar transparencia con la paleta de colores Halloween
     let r = red(this.color);
     let g = green(this.color);
     let b = blue(this.color);
@@ -62,7 +62,7 @@ class Particle {
     rotate(this.angle);
     noStroke();
     
-  // Salvaguarda por si color se hubiese perdido: reconstruyo p5.Color si hace falta
+  // Salvaguarda por si color se hubiese perdido
   const col = (this.color && this.color.levels) ? this.color : color(this.color || '#FF8A00');
     
     if (this.type === 'spark') {

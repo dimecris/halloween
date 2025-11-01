@@ -2,14 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <!-- CSP permisivo para MediaPipe -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com;">
+    <!-- CSP para permitir MediaPipe -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com;">{
     
     <title>p5.js Halloween</title>
     
-    <!-- p5.js core library siguiendo las convenciones del proyecto -->
+    <!-- Librerías principales del proyecto -->
     <script src="https://cdn.jsdelivr.net/npm/p5@2.0.5/lib/p5.js"></script>
-    <!-- p5.sound library siguiendo convenciones del proyecto -->
     <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.2.0/dist/p5.sound.min.js"></script>
     <script src="particulas.js"></script>
     
@@ -17,7 +16,6 @@
 </head>
 <body>
     <main></main>
-    <!-- Sketch principal siguiendo convenciones p5.js -->
     <script src="sketch.js"></script>
 </body>
 </html>

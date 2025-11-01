@@ -8,7 +8,7 @@ let isRunning = true;
 let aspectRatio, newVideoWidth, newVideoHeight;
 
 let sonido;
-let img, img2, adhesivo, adhesivo2, adhesivo3;
+let img, img2, img3, adhesivo, adhesivo2, adhesivo3;
 
 // Sistema de partículas Halloween
 let particles = [];
@@ -53,18 +53,21 @@ const COLORS = {
 // setup() function - Initialization, runs once at start
 async function setup() {
   // Canvas que se adapta al tamaño de la ventana
-  createCanvas(windowWidth, windowHeight, WEBGL);
-  // Inicializamos MediaPipe con fallback a simulación por teclado
+  createCanvas(windowWidth, windowHeight, WEBGL); // Crear el lienzo
   await initializeMediaPipe();
   blockFont = await loadFont("fonts/Scary-Halloween-Font.ttf");
   defaultFont = await loadFont("fonts/TiltWarp-Regular-VariableFont_XROT,YROT.ttf");
   cursiveFont = await loadFont("fonts/ShantellSans-Regular.ttf");
+
   img = await loadImage("img/tela.png");
   img2 = await loadImage("img/murcielago.png");
+  img3 = await loadImage("img/calabaza.png");
   adhesivo = await loadImage("img/adhesivo.png");
   adhesivo2 = await loadImage("img/adhesivo2.png");
   adhesivo3 = await loadImage("img/adhesivo3.png");
+
   sonido = await loadSound("music/halloween-ghost.mp3");
+  
  
   textAlign(CENTER, CENTER);
   textSize(blockTextSize);
@@ -75,7 +78,7 @@ async function setup() {
   });
 
   textFont(defaultFont);
-  // Configuramos la captura de video desde la cámara del usuario
+  // Configuración de la captura de video desde la cámara del usuario
   capture = createCapture({
     video: {
       width: 1280,
@@ -124,10 +127,10 @@ async function initializeMediaPipe() {
 
 // draw() function - Main animation loop, runs continuously
 function draw() {
-  // Dibujamos el video si está ejecutándose
+  // Renderizar video si está ejecutándose
   if (capture && isRunning && capture.elt && capture.elt.readyState >= 2) {
     
-    // Detectamos si MediaPipe está listo para procesar
+    // Detectar si MediaPipe está listo para procesar
     isMediaPipeReady && detectFaceAndJaw();
     
     let videoWidth = capture.width;
@@ -183,6 +186,12 @@ function draw() {
       rotate(PI/4); // 45 grados
       imageMode(CENTER);
       image(img2, 0, 0, 100, 100 / (img2.width/ img2.height));
+      pop();
+
+      push();
+      translate(width/2 -410, height/2 - 370);
+      imageMode(CORNER);
+      image(img3, 0, 0, 400, 400 / (img3.width/ img3.height));
       pop();
 
       push();

@@ -15,7 +15,6 @@ Esta aplicación web utiliza la cámara del dispositivo para detectar expresione
 ### Detección Facial
 - Análisis facial en tiempo real usando MediaPipe Face Landmarker
 - Detección de apertura de mandíbula (jawOpen) con umbrales configurables
-- Detección de gestos de soplo (mouthFunnel) para efectos direccionales
 - Cálculo de coordenadas exactas del centro de la boca
 
 ### Sistema de Partículas
@@ -56,7 +55,7 @@ p5-Halloween/
 ├── fonts/                 # Fuentes tipográficas Halloween
 ├── img/                   # Imágenes decorativas (telarañas, murciélagos)
 ├── music/                 # Archivos de audio ambientales
-└── .github/               # Documentación del proyecto
+
 ```
 
 ## Patrones de Programación Aplicados
@@ -76,16 +75,13 @@ Control del estado de la aplicación basado en:
 
 ### Optimización de Performance
 - Límite máximo de partículas simultáneas
-- Eliminación automática de partículas cuando salen del canvas
 - Uso de `lerp()` para transiciones suaves
 - Gestión eficiente de memoria en el sistema de partículas
 
 ## Controles de Interacción
 
 - **Apertura de boca** - Genera partículas Halloween desde la posición detectada
-- **Gesto de soplo** - Direcciona las partículas hacia arriba con mayor velocidad
-- **Movimiento del mouse** - Controla la rotación del texto 3D en los ejes X e Y
-- **Barra espaciadora** - Modo de prueba que simula boca abierta (fallback)
+
 
 ## Configuración y Ejecución
 
@@ -103,8 +99,6 @@ Control del estado de la aplicación basado en:
 ### Uso
 1. Posicionarse frente a la cámara
 2. Abrir la boca para activar efectos de partículas
-3. Hacer gestos de soplo para efectos direccionales
-4. Mover el mouse para rotar el texto 3D
 
 ## Consideraciones Técnicas
 
@@ -128,14 +122,6 @@ Definición de colores temáticos en constante `COLORS`:
 - Green: [50, 205, 50]
 - White: [255, 255, 255]
 
-## Desarrollo Académico
-
-Este proyecto fue desarrollado como trabajo práctico para la asignatura de Multimedia, aplicando conceptos de:
-- Programación creativa con p5.js
-- Visión por computadora con MediaPipe
-- Diseño de interacción usuario-máquina
-- Desarrollo web con tecnologías modernas
-- Sistemas de partículas y física computacional
 
 ## Posibles Mejoras Futuras
 
@@ -143,7 +129,6 @@ Este proyecto fue desarrollado como trabajo práctico para la asignatura de Mult
 - Sistema de niveles con diferentes efectos Halloween
 - Grabación y exportación de interacciones
 - Modo multijugador con múltiples rostros
-- Efectos de post-procesamiento en tiempo real
 
 ## Licencia
 
@@ -151,5 +136,5 @@ Proyecto desarrollado con fines educativos bajo licencia MIT.
 
 ---
 
-**Proyecto académico UOC - Grado en Multimedia**  
-**Curso 2024-2025** 
+**Proyecto UOC - Grado en Multimedia**  
+**Curso 2025-2026** 
