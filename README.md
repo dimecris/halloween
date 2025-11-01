@@ -1,75 +1,155 @@
-# Proyecto Halloween p5.js - Detección Facial
+# Proyecto Halloween p5.js - Detección Facial Interactiva
 
-Proyecto interactivo de Halloween que utiliza detección facial con MediaPipe y sistema de partículas en p5.js.
+Proyecto interactivo de Halloween desarrollado para la asignatura de Multimedia del Grado en Multimedia de la UOC. Combina detección facial en tiempo real con MediaPipe, efectos de partículas dinámicas y elementos visuales 3D para crear una experiencia inmersiva.
 
-## Características
+## Descripción del Proyecto
 
-- Detección facial en tiempo real con MediaPipe
-- Efectos de partículas Halloween desde la boca
-- Texto 3D que rota con interacción del mouse
-- Efectos de sonido terroríficos
-- Canvas responsivo
+Esta aplicación web utiliza la cámara del dispositivo para detectar expresiones faciales y generar efectos visuales en tiempo real. El proyecto se centra en la detección de apertura de boca y gestos de soplo para activar sistemas de partículas con temática Halloween.
 
 ## Demo en Vivo
 
-[Ver proyecto en vivo]( https://dimecris.github.io/halloween/)
+[Ver proyecto en vivo](https://dimecris.github.io/halloween/)
 
-## Tecnologías
+## Funcionalidades Implementadas
 
-- p5.js 2.0.5
-- MediaPipe Tasks Vision
-- p5.sound
-- HTML5 Canvas & WebGL
+### Detección Facial
+- Análisis facial en tiempo real usando MediaPipe Face Landmarker
+- Detección de apertura de mandíbula (jawOpen) con umbrales configurables
+- Detección de gestos de soplo (mouthFunnel) para efectos direccionales
+- Cálculo de coordenadas exactas del centro de la boca
 
-## Estructura del Proyecto
+### Sistema de Partículas
+- Generación dinámica de partículas desde la posición detectada de la boca
+- Física realista con gravedad, colisiones y acumulación
+- Partículas se apilan unas sobre otras en la parte inferior del canvas
+- Efectos de transparencia y desvanecimiento progresivo
+- Colores temáticos Halloween (naranjas, púrpuras, rojos oscuros)
+
+### Elementos Visuales
+- Texto 3D "ABRE LA BOCA" con rotación interactiva
+- Imágenes decorativas (telarañas, murciélagos) con efectos de rotación
+- Background dinámico que cambia según el estado de la boca
+- Canvas responsivo que se adapta al tamaño de la ventana
+- Efectos de espejo en el video para interacción natural
+
+### Audio Interactivo
+- Sonidos ambientales que se activan con la apertura de boca
+- Control automático de reproducción y parada según interacción
+- Integración con p5.sound para manejo de audio
+
+## Tecnologías Utilizadas
+
+- **p5.js 2.0.5** - Framework principal para gráficos y animación
+- **MediaPipe Tasks Vision** - Detección facial y análisis de expresiones
+- **p5.sound** - Sistema de audio interactivo
+- **WebGL** - Renderizado 3D para texto y efectos visuales
+- **HTML5 Canvas** - Superficie de dibujo para elementos 2D
+
+## Estructura del Código
 
 ```
 p5-Halloween/
-├── sketch.js           # Sketch principal de p5.js
-├── particulas.js       # Clase del sistema de partículas
-├── index.html          # Estructura HTML
-├── style.css           # Estilos del canvas
-├── fonts/              # Fuentes Halloween
-├── music/              # Archivos de audio
-└── .gitignore          # Archivos excluidos del repositorio
+├── sketch.js               # Sketch principal con setup() y draw()
+├── particulas.js           # Clase Particle para sistema de partículas
+├── index.html             # Estructura HTML y carga de librerías
+├── style.css              # Estilos para canvas responsivo
+├── fonts/                 # Fuentes tipográficas Halloween
+├── img/                   # Imágenes decorativas (telarañas, murciélagos)
+├── music/                 # Archivos de audio ambientales
+└── .github/               # Documentación del proyecto
 ```
 
-## Controles
+## Patrones de Programación Aplicados
 
-- **Abrir la boca** → Aparecen partículas Halloween
-- **Movimiento del mouse** → Rota el texto 3D
-- **Barra espaciadora** → Simular boca abierta (modo fallback)
+### Canvas Responsivo
+El canvas se adapta automáticamente al tamaño de la ventana usando `windowWidth` y `windowHeight`, manteniendo la proporción del video y centrado los elementos gráficos.
 
-## Funcionamiento
+### Sistema de Coordenadas WEBGL
+Utiliza el sistema de coordenadas centrado de WEBGL donde (0,0) está en el centro del canvas, facilitando el posicionamiento de elementos y rotaciones.
 
-1. **Carga inicial**: Se configura la cámara y MediaPipe
-2. **Detección facial**: Análisis en tiempo real de landmarks faciales
-3. **Detección de boca abierta**: Umbral configurable para activar efectos
-4. **Partículas Halloween**: Sistema dinámico con colores temáticos
-5. **Texto 3D interactivo**: Rotación basada en posición del mouse
+### Gestión de Estados
+Control del estado de la aplicación basado en:
+- Disponibilidad de MediaPipe
+- Estado de la cámara
+- Detección de gestos faciales
+- Ciclo de vida de partículas
 
-## Instalación y Uso
+### Optimización de Performance
+- Límite máximo de partículas simultáneas
+- Eliminación automática de partículas cuando salen del canvas
+- Uso de `lerp()` para transiciones suaves
+- Gestión eficiente de memoria en el sistema de partículas
 
-1. Clonar el repositorio
-2. Abrir `index.html` en un navegador moderno
-3. Permitir acceso a la cámara cuando se solicite
-4. ¡Abrir la boca para ver los efectos Halloween!
+## Controles de Interacción
 
-## Proyecto Académico
+- **Apertura de boca** - Genera partículas Halloween desde la posición detectada
+- **Gesto de soplo** - Direcciona las partículas hacia arriba con mayor velocidad
+- **Movimiento del mouse** - Controla la rotación del texto 3D en los ejes X e Y
+- **Barra espaciadora** - Modo de prueba que simula boca abierta (fallback)
 
-Desarrollado como parte del trabajo de la asignatura de Multimedia del Grado en Multimedia de la UOC. 
-Enfoque en programación creativa con p5.js y tecnologías web modernas.
+## Configuración y Ejecución
 
-### Objetivos del Proyecto
-- Implementar detección facial en tiempo real
-- Crear efectos visuales interactivos
-- Integrar audio y visuales de forma coherente
-- Aplicar principios de diseño de interfaz responsiva
+### Requisitos
+- Navegador moderno con soporte WebGL
+- Cámara web funcional
+- Conexión a internet (para CDN de librerías)
+
+### Instalación
+1. Clonar o descargar el repositorio
+2. Abrir `index.html` en un navegador web
+3. Conceder permisos de acceso a la cámara
+4. Esperar la carga de MediaPipe (indicador en pantalla)
+
+### Uso
+1. Posicionarse frente a la cámara
+2. Abrir la boca para activar efectos de partículas
+3. Hacer gestos de soplo para efectos direccionales
+4. Mover el mouse para rotar el texto 3D
+
+## Consideraciones Técnicas
+
+### Detección Facial
+- Utiliza 468 landmarks faciales de MediaPipe
+- Landmarks específicos para boca: 13, 14, 61, 291
+- Umbrales configurables para diferentes sensibilidades
+- Manejo de errores cuando no se detecta rostro
+
+### Sistema de Partículas
+- Clase `Particle` con propiedades físicas individuales
+- Detección de colisiones entre partículas para apilamiento
+- Aplicación de gravedad, fricción y rebotes
+- Control de opacidad con `lerp()` para transiciones naturales
+
+### Paleta de Colores
+Definición de colores temáticos en constante `COLORS`:
+- Orange: [255, 140, 0]
+- Purple: [139, 0, 139]
+- Dark Red: [139, 0, 0]
+- Green: [50, 205, 50]
+- White: [255, 255, 255]
+
+## Desarrollo Académico
+
+Este proyecto fue desarrollado como trabajo práctico para la asignatura de Multimedia, aplicando conceptos de:
+- Programación creativa con p5.js
+- Visión por computadora con MediaPipe
+- Diseño de interacción usuario-máquina
+- Desarrollo web con tecnologías modernas
+- Sistemas de partículas y física computacional
+
+## Posibles Mejoras Futuras
+
+- Implementación de más gestos faciales (sonrisa, parpadeo)
+- Sistema de niveles con diferentes efectos Halloween
+- Grabación y exportación de interacciones
+- Modo multijugador con múltiples rostros
+- Efectos de post-procesamiento en tiempo real
 
 ## Licencia
 
-Licencia MIT - Libre uso para fines educativos
+Proyecto desarrollado con fines educativos bajo licencia MIT.
 
 ---
 
-**Desarrollado en Halloween 2025** 
+**Proyecto académico UOC - Grado en Multimedia**  
+**Curso 2024-2025** 
