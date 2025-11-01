@@ -8,10 +8,10 @@ let isRunning = true;
 let aspectRatio, newVideoWidth, newVideoHeight;
 
 let sonido;
+let img, img2, adhesivo, adhesivo2, adhesivo3;
 
 // Sistema de partículas Halloween
 let particles = [];
-let maxParticles = 100;
 
 // MediaPipe variables
 let faceLandmarker;
@@ -21,8 +21,16 @@ let jawOpen = false;
 let jawOpenThreshold = 0.05; // Umbral para detectar boca abierta
 let jawOpenValue = 0;
 
-// Texto 3D variables
+// Variables globales para coordenadas de la boca
+let mouthCenterX = 0;
+let mouthCenterY = 0;
+
+// Fuentes
 let blockFont;
+let defaultFont;
+let cursiveFont;
+
+// Texto 3D variables
 let blockText;
 let h1 = "ABRE LA BOCA";
 let blockTextSize = 130;
@@ -50,12 +58,14 @@ async function setup() {
   await initializeMediaPipe();
   blockFont = await loadFont("fonts/Scary-Halloween-Font.ttf");
   defaultFont = await loadFont("fonts/TiltWarp-Regular-VariableFont_XROT,YROT.ttf");
-  try {
-    sonido = await loadSound("music/halloween-ghost.mp3");
-    console.log('[audio] loaded successfully');
-  } catch (e) {
-    console.warn('[audio] failed to load', e);
-  }
+  cursiveFont = await loadFont("fonts/ShantellSans-Regular.ttf");
+  img = await loadImage("img/tela.png");
+  img2 = await loadImage("img/murcielago.png");
+  adhesivo = await loadImage("img/adhesivo.png");
+  adhesivo2 = await loadImage("img/adhesivo2.png");
+  adhesivo3 = await loadImage("img/adhesivo3.png");
+  sonido = await loadSound("music/halloween-ghost.mp3");
+ 
   textAlign(CENTER, CENTER);
   textSize(blockTextSize);
     
@@ -73,7 +83,7 @@ async function setup() {
       facingMode: 'user'
     },
     audio: false,
-    flipped: true,
+    flipped: true, // Voltear el video para efecto espejo
   }, function() {
     console.log('Cámara iniciada');
   });
@@ -139,9 +149,69 @@ function draw() {
         background(...COLORS.ORANGE)
         sonido.stop();
       }
-      
+      push();
+      //translate(-newVideoWidth/2 - 10, -height/2 - 10);
+      rectMode(CENTER);
+      noStroke();
+      fill(...COLORS.WHITE);
+      rect(0, 40, newVideoWidth + 20,  newVideoHeight + 100);  
+      pop();
+
+
+      // Dibujamos el video capturado
+      push();
+      scale(-1, 1); // Voltear horizontalmente para efecto espejo
       imageMode(CENTER);
       image(capture, 0, 0, newVideoWidth, newVideoHeight);
+      pop();
+
+      push();
+      // Posicionamos donde queremos la imagen
+      translate(-width/2, -height/2 - 10);
+      imageMode(CORNER);
+      image(img, 0, 0, 400, 400 / (img.width / img.height));
+      pop();
+
+      push();
+      translate(width/2 - 200, -height/2 + 50);
+      imageMode(CORNER);
+      image(img2, 0, 0, 200, 200 / (img2.width/ img2.height));
+      pop();
+
+      push();
+      translate(-width/2 +200, height/2 - 100);
+      rotate(PI/4); // 45 grados
+      imageMode(CENTER);
+      image(img2, 0, 0, 100, 100 / (img2.width/ img2.height));
+      pop();
+
+      push();
+      translate(newVideoWidth/2, -newVideoHeight/2);
+      rotate(PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo, 0, 0, 150, 150 / (adhesivo.width / adhesivo.height));
+      pop();
+
+      push();
+      translate(-newVideoWidth/2, -newVideoHeight/2);
+      rotate(-PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo2, 0, 0, 150, 150 / (adhesivo2.width / adhesivo2.height));
+      pop();
+
+      push();
+      translate(newVideoWidth/2, newVideoHeight/2 + 100);
+      rotate(-PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo3, 0, 0, 150, 150 / (adhesivo3.width / adhesivo3.height));
+      pop();
+
+      push();
+      translate(-newVideoWidth/2, newVideoHeight/2 + 100);
+      rotate(PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo3, 0, 0, 150, 150 / (adhesivo3.width / adhesivo3.height));
+      pop();
       
       // Aplicamos un overlay semitransparente para el efecto Halloween
       push();
@@ -149,12 +219,13 @@ function draw() {
       fill(...COLORS.BLACK, 100);
       plane(newVideoWidth, newVideoHeight);
       pop();
-      
-      displayJawStatus();
+
+    
+      creditos();
       
       // Creamos partículas Halloween cuando la boca está abierta
       if (jawOpen && frameCount % 3 === 0) { // Crear partículas cada 3 frames
-        createHalloweenParticles(0, -50); // Centro del video
+        createHalloweenParticles(); // Ya no necesita parámetros, usa coordenadas globales
       }
     }
   } else if (!isRunning) {
@@ -178,14 +249,17 @@ function draw() {
   drawParticles();
 
   // Interacciones del mouse para rotar el texto 3D
-  rotY = map(jawOpenValue, 0, 0.9, 0, PI * 0.25); 
-  rotX = map(jawOpenValue, 0, 0.9, 0, PI * 0.15);
+  rotY = map(jawOpenValue, 0, 0.9, 0, PI * 0.05); 
+
+  // Con lerp para suavizar:
+  let targetRotY = map(jawOpenValue, 0, 1, 0, PI * 0.05);
+  rotY = lerp(rotY, targetRotY, 0.3); // Transición suave
 
   // Dibujamos el texto 3D Halloween
   if (blockText) {
     push();
-    translate(0, newVideoHeight/2 + 100);
-    rotateX(rotX);  
+    translate(0, - newVideoHeight/2 - 100);
+    rotateX(0);  
     rotateY(rotY);
 
     // Cambiamos el color del texto según el estado de la boca
@@ -195,6 +269,8 @@ function draw() {
     pop();
   }
 }
+
+
 
 function detectFaceAndJaw() {
   if (!isMediaPipeReady || !faceLandmarker || !capture.elt) return;
@@ -206,6 +282,7 @@ function detectFaceAndJaw() {
     lastVideoTime = video.currentTime;
     const detectionResults = faceLandmarker.detectForVideo(video, nowInMs);
       
+    // Procesar blendshapes (deformaciones)
     if (detectionResults.faceBlendshapes && detectionResults.faceBlendshapes.length > 0) {
         const blendshapes = detectionResults.faceBlendshapes[0].categories;
         
@@ -213,76 +290,71 @@ function detectFaceAndJaw() {
           if (blendshapes[i].categoryName === 'jawOpen') {
             jawOpenValue = blendshapes[i].score;
             jawOpen = jawOpenValue > jawOpenThreshold;
-            break;
+            break
           }
+         
         }
     }
     
+    // Procesar landmarks faciales (posiciones)
+    if (detectionResults.faceLandmarks && detectionResults.faceLandmarks.length > 0) {
+      const landmarks = detectionResults.faceLandmarks[0];
+      
+      // Landmarks clave para la boca según MediaPipe Face Model
+      const upperLip = landmarks[13];   // Centro labio superior
+      const lowerLip = landmarks[14];   // Centro labio inferior
+      const leftCorner = landmarks[61]; // Comisura izquierda
+      const rightCorner = landmarks[291]; // Comisura derecha
+      
+      // Calcular centro de la boca
+      const normalizedMouthX = (upperLip.x + lowerLip.x) / 2;
+      const normalizedMouthY = (upperLip.y + lowerLip.y) / 2;
+      
+      // Convertir coordenadas normalizadas (0-1) a coordenadas del canvas WEBGL
+      // MediaPipe coordenadas están espejadas, así que invertimos X
+      mouthCenterX = map(1 - normalizedMouthX, 0, 1, -newVideoWidth/2, newVideoWidth/2);
+      mouthCenterY = map(normalizedMouthY, 0, 1, -newVideoHeight/2, newVideoHeight/2);
+      
+      // Debug: mostrar coordenadas
+      console.log(`Boca en: (${mouthCenterX.toFixed(1)}, ${mouthCenterY.toFixed(1)})`);
+    }
   }
 }
 
-function displayJawStatus() {
+function creditos() {
   push();
-  translate(0, -newVideoHeight/2 +50);
+  translate(0, newVideoHeight/2 + 50);
   
-  if (isMediaPipeReady) {
-    if (jawOpen) {
-      fill(...COLORS.GREEN);
-      textSize(40);
-      text('¡BOCA ABIERTA!', 0, 0);
-      
-    } else {
-      fill(...COLORS.ORANGE);
-      textSize(30);
-      text('Abre la boca para Halloween', 0, 0);
-    }
-  } 
+ 
+      fill(...COLORS.BLACK);
+      textSize(20);
+      textFont(cursiveFont);
+      text('Laboratorio HealthySmile', 0, 0);
+   
   pop();
 }
 
-
-function toggleCamera() {
-  isRunning = !isRunning;
+// FUNCIÓN PARA CREAR PARTÍCULAS HALLOWEEN - Desde posición real de la boca
+function createHalloweenParticles() {
+  // Usar coordenadas reales detectadas por MediaPipe
+  let x = mouthCenterX ;
+  let y = mouthCenterY;;
+  console.log("Creando partícula en: ", x, y);
   
-  if (isRunning) {
-    button.html('Parar');
-    button.class('camera-button stop');
-    button.style('background-color', `rgb(${COLORS.UI_STOP.join(',')})`);
-  } else {
-    button.html('Comenzar');
-    button.class('camera-button start');
-    button.style('background-color', `rgb(${COLORS.UI_START.join(',')})`);
-  }
-}
-// FUNCIÓN PARA CREAR PARTÍCULAS HALLOWEEN
-function createHalloweenParticles(mouthX, mouthY) {
-  if (particles.length < maxParticles) {
-    // Usamos coordenadas exactas de la boca con pequeña variación aleatoria
-    let x = mouthX + random(-20, 20); 
-    let y = mouthY + random(-10, 10);
-    
-    // Seleccionamos colores Halloween que hemos definido
-    let color = random(Object.values(COLORS));
-    
-    // Tamaño basado en apertura de boca
-    let particleSize = map(jawOpenValue, 0, 1, 5, 55) ;
+  // Seleccionamos colores Halloween que hemos definido
+  let color = random(Object.values(COLORS));
   
-    
-    // Vida útil más larga cuando la boca está más abierta
-    let lifespan = map(jawOpenValue, 0, 1, 40, 100);
-    
-    let type = random(['spark', 'brush']);
-    let particle = new Particle(x, y, particleSize, color, lifespan, type);
-    
-    // Propiedades para control de opacidad
-    particle.alpha = 255;
-    particle.maxLife = lifespan; // Guardar vida inicial para cálculos
-    
-    particles.push(particle);
-  }
+  // Tamaño basado en apertura de boca
+  let particleSize = map(jawOpenValue, 0, 1, 1, 25);
+  let type = random(['spark', 'brush']);
+  
+  // Dirección basada en mouthFunnel para efectos de soplo
+  let particle = new Particle(x, y, particleSize, color, 1000, type);
+  
+  particles.push(particle);
 }
 
-// FUNCIÓN PARA ACTUALIZAR PARTÍCULAS - Transición más suave
+// FUNCIÓN PARA ACTUALIZAR PARTÍCULAS - Con acumulación en el suelo
 function updateParticles() {
   for (let i = particles.length - 1; i >= 0; i--) {
     particles[i].update();
@@ -306,10 +378,8 @@ function updateParticles() {
     let ageOpacity = map(particles[i].life, 0, particles[i].maxLife || 100, 0, 255);
     particles[i].alpha = Math.min(particles[i].alpha, ageOpacity);
     
-    // Eliminamos partículas muertas, fuera de pantalla o invisibles
-    if (particles[i].life <= 0 || 
-        particles[i].y > height + 50 || 
-        particles[i].alpha < 1) { // Cambiar de 3 a 1 para más gradual
+    // Eliminar solo cuando la vida se agota o alpha es muy bajo
+    if (particles[i].life <= 0 || particles[i].alpha < 0.5) {
       particles.splice(i, 1);
     }
   }
