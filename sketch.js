@@ -55,7 +55,9 @@ let cameraInitialized = false;
 
 // Función para detectar si se ejecuta en Electron
 function isElectron() {
-  return typeof process !== 'undefined' && process.versions && process.versions.electron;
+  return (typeof navigator !== 'undefined' && /electron/i.test(navigator.userAgent))
+      || (typeof window !== 'undefined' && window.audios && typeof window.audios.url === 'function');
+
 }
 
 
