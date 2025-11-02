@@ -49,12 +49,17 @@ const COLORS = {
   UI_STOP: [255, 69, 0],      // Rojo-naranja botón parar
 };
 
+// Variables para controles de cámara
+let startButton, stopButton;
+let cameraInitialized = false;
 
 // setup() function - Initialization, runs once at start
 async function setup() {
   // Canvas que se adapta al tamaño de la ventana
   createCanvas(windowWidth, windowHeight, WEBGL); // Crear el lienzo
   await initializeMediaPipe();
+  
+  // Cargar recursos
   blockFont = await loadFont("fonts/Scary-Halloween-Font.ttf");
   defaultFont = await loadFont("fonts/TiltWarp-Regular-VariableFont_XROT,YROT.ttf");
   cursiveFont = await loadFont("fonts/ShantellSans-Regular.ttf");
@@ -68,7 +73,6 @@ async function setup() {
 
   sonido = await loadSound("music/halloween-ghost.mp3");
   
- 
   textAlign(CENTER, CENTER);
   textSize(blockTextSize);
     
@@ -78,23 +82,97 @@ async function setup() {
   });
 
   textFont(defaultFont);
-  // Configuración de la captura de video desde la cámara del usuario
-  capture = createCapture({
-    video: {
-      width: 1280,
-      height: 720,
-      facingMode: 'user'
-    },
-    audio: false,
-    flipped: true, // Voltear el video para efecto espejo
-  }, function() {
-    console.log('Cámara iniciada');
-  });
-  // Ocultamos el elemento HTML de video para mostrarlo en canvas
-  capture.hide();
+  
+  // Crear controles de cámara desde p5.js
+  createCameraControls();
+  
+  // NO inicializar la cámara automáticamente
+  capture = null;
+  isRunning = false;
+  cameraInitialized = false;
+  
   // Rotación inicial del texto 3D
   rotX = 0;
   rotY = 0;
+}
+
+// Función para crear controles de cámara desde p5.js
+function createCameraControls() {
+  // Crear botón de activar cámara
+  startButton = createButton('Activar Cámara');
+  startButton.position(windowWidth - 250, 20);
+  startButton.class('camera-button start');
+  startButton.mousePressed(activateCamera);
+  
+  // Crear botón de pausar cámara
+  stopButton = createButton(' ');
+  stopButton.position(windowWidth - 50, 20);
+  stopButton.class('camera-button stop');
+  stopButton.style('display', 'none');
+  stopButton.mousePressed(pauseCamera);
+  
+  console.log('Controles de cámara creados desde p5.js');
+}
+
+// Función para activar la cámara
+async function activateCamera() {
+  try {
+    console.log('Activando cámara desde p5.js...');
+    
+    // Crear captura p5.js
+    capture = createCapture({
+      video: {
+        width: 1280,
+        height: 720,
+        facingMode: 'user',
+      },
+      audio: false
+    }, function() {
+      console.log('Cámara activada correctamente');
+      isRunning = true;
+      cameraInitialized = true;
+      
+      // Cambiar visibilidad de botones
+      startButton.style('display', 'none');
+      stopButton.style('display', 'block');
+    });
+    
+    capture.hide(); // Ocultar elemento video HTML por defecto
+    
+  } catch (error) {
+    console.error('Error al activar cámara:', error);
+    
+    // Mostrar mensaje de error en canvas
+    push();
+    fill(...COLORS.DARK_RED);
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    text('Error: No se pudo acceder a la cámara', 0, 100);
+    text('Verifica permisos del navegador', 0, 130);
+    pop();
+  }
+}
+
+// Función para pausar la cámara
+function pauseCamera() {
+  console.log('Pausando cámara desde p5.js...');
+  
+  if (capture) {
+    capture.remove();
+    capture = null;
+  }
+  
+  isRunning = false;
+  cameraInitialized = false;
+  
+  // Cambiar visibilidad de botones
+  startButton.style('display', 'block');
+  stopButton.style('display', 'none');
+  
+  // Limpiar partículas
+  particles = [];
+  
+  console.log('Cámara pausada');
 }
 
 // initializeMediaPipe() function - Cargar y configurar MediaPipe Face Landmarker
@@ -127,8 +205,43 @@ async function initializeMediaPipe() {
 
 // draw() function - Main animation loop, runs continuously
 function draw() {
+  // Estado sin cámara activa - Mostrar pantalla de espera
+  if (!cameraInitialized || !capture) {
+    background(...COLORS.BLACK);
+    
+    // Mostrar texto 3D incluso sin cámara
+    if (blockText) {
+      push();
+      translate(0, -100);
+      rotateX(0);
+      rotateY(frameCount * 0.01); // Rotación suave automática
+      fill(...COLORS.ORANGE);
+      stroke(...COLORS.DARK_RED);
+      strokeWeight(2);
+      model(blockText);
+      pop();
+    }
+    
+    // Mensaje de instrucciones
+    fill(...COLORS.WHITE);
+    textSize(24);
+    text('Haz clic en "Activar Cámara" para comenzar', 0, 100);
+    return; // Salir de draw() hasta que se active la cámara
+  }
+
   // Renderizar video si está ejecutándose
   if (capture && isRunning && capture.elt && capture.elt.readyState >= 2) {
+    // Mostrar texto 3D
+    if (blockText) {
+      push();
+      rotateX(rotX);
+      rotateY(frameCount * 0.01);
+      fill(...COLORS.ORANGE);
+      stroke(...COLORS.DARK_RED);
+      strokeWeight(2);
+      model(blockText);
+      pop();
+    }
     
     // Detectar si MediaPipe está listo para procesar
     isMediaPipeReady && detectFaceAndJaw();
@@ -145,25 +258,24 @@ function draw() {
       if (jawOpen) {
         background(...COLORS.GREEN)
         if (!sonido.isPlaying()) {
-              sonido.play(); // Usar play() en lugar de loop()
-              sonido.loop(); // Usar play() en lugar de loop()
+          sonido.play();
+          sonido.loop();
         } 
       } else {
         background(...COLORS.ORANGE)
         sonido.stop();
       }
+
       push();
-      //translate(-newVideoWidth/2 - 10, -height/2 - 10);
       rectMode(CENTER);
       noStroke();
       fill(...COLORS.WHITE);
-      rect(0, 40, newVideoWidth + 20,  newVideoHeight + 100);  
+      rect(0, 40, newVideoWidth + 20, newVideoHeight + 100);  
       pop();
 
-
-      // Dibujamos el video capturado
+      // Dibujamos el video capturado con efecto espejo
       push();
-      scale(-1, 1); // Voltear horizontalmente para efecto espejo
+      scale(-1, 1);
       imageMode(CENTER);
       image(capture, 0, 0, newVideoWidth, newVideoHeight);
       pop();
@@ -233,8 +345,8 @@ function draw() {
       creditos();
       
       // Creamos partículas Halloween cuando la boca está abierta
-      if (jawOpen && frameCount % 3 === 0) { // Crear partículas cada 3 frames
-        createHalloweenParticles(); // Ya no necesita parámetros, usa coordenadas globales
+      if (jawOpen && frameCount % 3 === 0) {
+        createHalloweenParticles();
       }
     }
   } else if (!isRunning) {
@@ -243,12 +355,11 @@ function draw() {
     textAlign(CENTER, CENTER);
     textSize(48);
     text('CÁMARA PAUSADA', 0, 0);
-  } else {
-    background(...COLORS.BLACK);
-    fill(...COLORS.WHITE);
-    textAlign(CENTER, CENTER);
-    textSize(32);
-    text('CARGANDO CÁMARA...', 0, 0);
+    
+    // Mostrar instrucciones para reactivar
+    fill(...COLORS.ORANGE);
+    textSize(24);
+    text('Haz clic en "Activar Cámara" para continuar', 0, 50);
   }
 
   clearDepth();
@@ -257,24 +368,18 @@ function draw() {
   updateParticles();
   drawParticles();
 
-  // Interacciones del mouse para rotar el texto 3D
-  rotY = map(jawOpenValue, 0, 0.9, 0, PI * 0.05); 
-
-  // Con lerp para suavizar:
+  // Interacciones para rotar el texto 3D
   let targetRotY = map(jawOpenValue, 0, 1, 0, PI * 0.05);
-  rotY = lerp(rotY, targetRotY, 0.3); // Transición suave
+  rotY = lerp(rotY, targetRotY, 0.3);
 
   // Dibujamos el texto 3D Halloween
-  if (blockText) {
+  if (blockText && cameraInitialized) {
     push();
-    translate(0, - newVideoHeight/2 - 100);
+    translate(0, -newVideoHeight/2 - 100);
     rotateX(0);  
     rotateY(rotY);
-
-    // Cambiamos el color del texto según el estado de la boca
     jawOpen ? fill(...COLORS.GREEN) : fill(...COLORS.WHITE);
     model(blockText);
-    //console.log(jawOpenValue);
     pop();
   }
 }
@@ -325,7 +430,7 @@ function detectFaceAndJaw() {
       mouthCenterY = map(normalizedMouthY, 0, 1, -newVideoHeight/2, newVideoHeight/2);
       
       // Debug: mostrar coordenadas
-      console.log(`Boca en: (${mouthCenterX.toFixed(1)}, ${mouthCenterY.toFixed(1)})`);
+      //console.log(`Boca en: (${mouthCenterX.toFixed(1)}, ${mouthCenterY.toFixed(1)})`);
     }
   }
 }
@@ -401,9 +506,17 @@ function drawParticles() {
   }
 }
 
-// windowResized() function - Canvas responsivo
+// Función para reposicionar botones en caso de resize
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+  
+  // Reposicionar botones
+  if (startButton) {
+      startButton.position(windowWidth - 250, 20);
+  }
+  if (stopButton) {
+      stopButton.position(windowWidth - 50, 20);
+  }
 }
 
 

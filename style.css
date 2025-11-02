@@ -11,27 +11,36 @@ canvas {
   object-fit: cover; /* Mantener proporción */
 }
 
-/* Estilos para el botón de cámara */
+/* Estilos para botones de cámara creados desde p5.js */
 .camera-button {
-  position: absolute;
-  border: none;
-  border-radius: 0px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 1000;
-  color: white;
-  transition: background-color 0.3s ease;
-}
-
-.camera-button.stop {
-  background-color: #ff6b35; /* Naranja para parar */
+  padding: 15px 25px ;
+  font-size: 16px ;
+  font-weight: bold ;
+  border: 3px solid ;
+  cursor: pointer ;
+  transition: all 0.3s ease ;
+  text-transform: uppercase ;
+  letter-spacing: 1px ;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) ;
 }
 
 .camera-button.start {
-  background-color: #4CAF50; /* Verde para comenzar */
+  background:  #ff8c00 ;
+  color: white ;
 }
 
-.camera-button:hover {
-  opacity: 0.8;
+.camera-button.start:hover {
+  transform: scale(1.05) ;
+}
+
+.camera-button.stop {
+  background:  #8b0000 ;
+  border-color: #fff ;
+  height: 30px;
+  width: 30px;
+  padding: 5px;
+}
+
+.camera-button.stop:hover {
+  transform: scale(1.05) ;
 }
