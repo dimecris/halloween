@@ -1,0 +1,62 @@
+{
+  "name": "p5-halloween",
+  "version": "1.0.0",
+  "description": "Aplicación de deteccion de cara",
+  "homepage": "https://github.com/dimecris/halloween#readme",
+  "bugs": {
+    "url": "https://github.com/dimecris/halloween/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dimecris/halloween.git"
+  },
+  "license": "MIT",
+  "author": "Kris Darias",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never",
+    "pack": "electron-builder --dir",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "electron": "^39.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.uoc.p5-halloween-kiosk",
+    "productName": "Halloween Kiosk UOC",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "sketch.js",
+      "particulas.js",
+      "preload.js",
+      "style.css",
+      "fonts/**",
+      "img/**",
+      "music/**"
+    ],
+    "extraResources": [
+      { "from": "music", "to": "music" }
+    ],
+    "asarUnpack": [
+      "music/**"
+    ],
+    "mac": {
+      "category": "public.app-category.entertainment",
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

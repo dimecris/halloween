@@ -2,22 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <!-- CSP para permitir MediaPipe -->
-     <meta 
+    <!-- CSP para p5.js Halloween con audio local -->
+    <meta 
       http-equiv="Content-Security-Policy" 
-      content="default-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://cdn.jsdelivr.net blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://storage.googleapis.com;">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+      content="
+        default-src 'self' data: file:; 
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net file:; 
+        style-src 'self' 'unsafe-inline' file:;
+        img-src 'self' data: blob: file:;
+        media-src 'self' data: blob: file:;
+        connect-src 'self' https: file:;
+        font-src 'self' data: file:;
+        worker-src 'self' blob:;
+      ">
+    
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>p5.js Halloween</title>
     
-    <!-- Librerías principales del proyecto -->
+    <!-- Librerías del proyecto -->
     <script src="https://cdn.jsdelivr.net/npm/p5@2.0.5/lib/p5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5.sound@0.2.0/dist/p5.sound.min.js"></script>
     <script src="particulas.js"></script>
+    
     
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
     <main></main>
     <script src="sketch.js"></script>
+    
 </body>
 </html>

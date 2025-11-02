@@ -4,8 +4,8 @@ class Particle {
     this.vel = p5.Vector.random2D().mult(random(0.3, 5.5));  // velocidad inicial
     if (type === 'brush') this.vel.mult(0.6);                // brochazo = movimiento más suave
     this.size = size * random(0.6, 1.4);                     // tamaño con ligera variación
-  // Aseguro un p5.Color válido
-  // Si ya viene un p5.Color (tiene .levels), lo uso; si no, convierto o aplico un fallback
+  // Color válido p5.js
+  // Si ya es p5.Color (tiene .levels), lo uso; si no, convierto o aplico fallback
     this.color = (col && col.levels) ? col : color(col || '#FF8A00');
     this.life = life;                                        // vida total en frames
     this.age = 0;                                            // edad en frames

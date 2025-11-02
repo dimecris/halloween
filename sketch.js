@@ -1,10 +1,10 @@
-// p5.js Halloween Project - Main sketch
-// Proyecto creado para la asignatura de Multimedia
+// Proyecto Halloween p5.js - UOC Multimedia
+// Aplicación interactiva con detección facial
 
 let capture;
 let isRunning = true;
 
-//video
+// Variables de video
 let aspectRatio, newVideoWidth, newVideoHeight;
 
 let sonido;
@@ -13,7 +13,7 @@ let img, img2, img3, adhesivo, adhesivo2, adhesivo3;
 // Sistema de partículas Halloween
 let particles = [];
 
-// MediaPipe variables
+// Variables MediaPipe
 let faceLandmarker;
 let isMediaPipeReady = false;
 let lastVideoTime = -1;
@@ -21,7 +21,7 @@ let jawOpen = false;
 let jawOpenThreshold = 0.05; // Umbral para detectar boca abierta
 let jawOpenValue = 0;
 
-// Variables globales para coordenadas de la boca
+// Coordenadas de la boca
 let mouthCenterX = 0;
 let mouthCenterY = 0;
 
@@ -36,8 +36,8 @@ let h1 = "ABRE LA BOCA";
 let blockTextSize = 130;
 let rotX, rotY;
 
-// Paleta de colores Halloween que hemos seleccionado
-// Utilizamos colores oscuros característicos de Halloween
+// Paleta de colores Halloween
+// Colores oscuros característicos de Halloween
 const COLORS = {
   ORANGE: [255, 140, 0],      // Naranja calabaza
   BLACK: [20, 20, 20],        // Negro profundo
@@ -53,10 +53,16 @@ const COLORS = {
 let startButton, stopButton;
 let cameraInitialized = false;
 
-// setup() function - Initialization, runs once at start
+// Función para detectar si se ejecuta en Electron
+function isElectron() {
+  return typeof process !== 'undefined' && process.versions && process.versions.electron;
+}
+
+
+// Función setup - Inicialización
 async function setup() {
-  // Canvas que se adapta al tamaño de la ventana
-  createCanvas(windowWidth, windowHeight, WEBGL); // Crear el lienzo
+  // Canvas adaptable al tamaño de ventana
+  createCanvas(windowWidth, windowHeight, WEBGL);
   await initializeMediaPipe();
   
   // Cargar recursos
@@ -71,7 +77,20 @@ async function setup() {
   adhesivo2 = await loadImage("img/adhesivo2.png");
   adhesivo3 = await loadImage("img/adhesivo3.png");
 
-  sonido = await loadSound("music/halloween-ghost.mp3");
+  try {
+     if (isElectron()) {
+      console.log('Ejecutando en Electron - Carga audio desde preload.js');
+      const sonidoUrl = window.audios.url('halloween-ghost.mp3');
+      sonido = await loadSound(sonidoUrl);
+    }else{
+      console.log("Cargando audio en entorno web");
+      sonido = await loadSound("music/halloween-ghost.mp3");
+
+    }
+  } catch (error) {
+    console.warn("Audio no disponible, continuando sin sonido:", error);
+    sonido = null;
+  }
   
   textAlign(CENTER, CENTER);
   textSize(blockTextSize);
@@ -83,10 +102,10 @@ async function setup() {
 
   textFont(defaultFont);
   
-  // Crear controles de cámara desde p5.js
+  // Crear controles de cámara
   createCameraControls();
   
-  // NO inicializar la cámara automáticamente
+  // Inicializar la cámara después
   capture = null;
   isRunning = false;
   cameraInitialized = false;
@@ -96,7 +115,7 @@ async function setup() {
   rotY = 0;
 }
 
-// Función para crear controles de cámara desde p5.js
+// Función para crear controles de cámara
 function createCameraControls() {
   // Crear botón de activar cámara
   startButton = createButton('Activar Cámara');
@@ -111,22 +130,22 @@ function createCameraControls() {
   stopButton.style('display', 'none');
   stopButton.mousePressed(pauseCamera);
   
-  console.log('Controles de cámara creados desde p5.js');
+  console.log('Controles de cámara creados');
 }
 
 // Función para activar la cámara
 async function activateCamera() {
   try {
-    console.log('Activando cámara desde p5.js...');
+    console.log('Activando cámara...');
     
-    // Crear captura p5.js
+    // Crear captura de video
     capture = createCapture({
       video: {
         width: 1280,
         height: 720,
         facingMode: 'user',
       },
-      audio: false
+      audio: false,
     }, function() {
       console.log('Cámara activada correctamente');
       isRunning = true;
@@ -155,13 +174,15 @@ async function activateCamera() {
 
 // Función para pausar la cámara
 function pauseCamera() {
-  console.log('Pausando cámara desde p5.js...');
+  console.log('Pausando cámara...');
   
   if (capture) {
     capture.remove();
     capture = null;
   }
-  
+  if (sonido && sonido.isPlaying()) { 
+    sonido.stop();
+  }
   isRunning = false;
   cameraInitialized = false;
   
@@ -176,7 +197,7 @@ function pauseCamera() {
 }
 
 // initializeMediaPipe() function - Cargar y configurar MediaPipe Face Landmarker
-// Implementamos manejo de errores para fallback si no está disponible
+// Manejo de errores para fallback si no está disponible
 async function initializeMediaPipe() {
   try {
     console.log('Inicializando MediaPipe para nuestro proyecto Halloween...');
@@ -196,7 +217,7 @@ async function initializeMediaPipe() {
     });
     
     isMediaPipeReady = true;
-    console.log('MediaPipe Face Landmarker configurado correctamente');
+    console.log('MediaPipe Face Landmarker configurado');
   } catch (error) {
     console.error('MediaPipe no disponible:', error);
     isMediaPipeReady = false;
@@ -256,92 +277,21 @@ function draw() {
       
       // Cambiamos el background según el estado de la boca
       if (jawOpen) {
-        background(...COLORS.GREEN)
-        if (!sonido.isPlaying()) {
-          sonido.play();
-          sonido.loop();
-        } 
+        background(...COLORS.GREEN);
+        if (sonido) {
+          if (!sonido.isPlaying()) {
+            sonido.play();
+            sonido.loop();
+          } 
+        }
       } else {
         background(...COLORS.ORANGE)
-        sonido.stop();
+        if (sonido) {
+          sonido.stop();
+        }
       }
 
-      push();
-      rectMode(CENTER);
-      noStroke();
-      fill(...COLORS.WHITE);
-      rect(0, 40, newVideoWidth + 20, newVideoHeight + 100);  
-      pop();
-
-      // Dibujamos el video capturado con efecto espejo
-      push();
-      scale(-1, 1);
-      imageMode(CENTER);
-      image(capture, 0, 0, newVideoWidth, newVideoHeight);
-      pop();
-
-      push();
-      // Posicionamos donde queremos la imagen
-      translate(-width/2, -height/2 - 10);
-      imageMode(CORNER);
-      image(img, 0, 0, 400, 400 / (img.width / img.height));
-      pop();
-
-      push();
-      translate(width/2 - 200, -height/2 + 50);
-      imageMode(CORNER);
-      image(img2, 0, 0, 200, 200 / (img2.width/ img2.height));
-      pop();
-
-      push();
-      translate(-width/2 +200, height/2 - 100);
-      rotate(PI/4); // 45 grados
-      imageMode(CENTER);
-      image(img2, 0, 0, 100, 100 / (img2.width/ img2.height));
-      pop();
-
-      push();
-      translate(width/2 -410, height/2 - 370);
-      imageMode(CORNER);
-      image(img3, 0, 0, 400, 400 / (img3.width/ img3.height));
-      pop();
-
-      push();
-      translate(newVideoWidth/2, -newVideoHeight/2);
-      rotate(PI/4); // 45 grados
-      imageMode(CENTER);
-      image(adhesivo, 0, 0, 150, 150 / (adhesivo.width / adhesivo.height));
-      pop();
-
-      push();
-      translate(-newVideoWidth/2, -newVideoHeight/2);
-      rotate(-PI/4); // 45 grados
-      imageMode(CENTER);
-      image(adhesivo2, 0, 0, 150, 150 / (adhesivo2.width / adhesivo2.height));
-      pop();
-
-      push();
-      translate(newVideoWidth/2, newVideoHeight/2 + 100);
-      rotate(-PI/4); // 45 grados
-      imageMode(CENTER);
-      image(adhesivo3, 0, 0, 150, 150 / (adhesivo3.width / adhesivo3.height));
-      pop();
-
-      push();
-      translate(-newVideoWidth/2, newVideoHeight/2 + 100);
-      rotate(PI/4); // 45 grados
-      imageMode(CENTER);
-      image(adhesivo3, 0, 0, 150, 150 / (adhesivo3.width / adhesivo3.height));
-      pop();
-      
-      // Aplicamos un overlay semitransparente para el efecto Halloween
-      push();
-      noStroke();
-      fill(...COLORS.BLACK, 100);
-      plane(newVideoWidth, newVideoHeight);
-      pop();
-
-    
+      drawUI();
       creditos();
       
       // Creamos partículas Halloween cuando la boca está abierta
@@ -349,18 +299,7 @@ function draw() {
         createHalloweenParticles();
       }
     }
-  } else if (!isRunning) {
-    background(...COLORS.BLACK);
-    fill(...COLORS.WHITE);
-    textAlign(CENTER, CENTER);
-    textSize(48);
-    text('CÁMARA PAUSADA', 0, 0);
-    
-    // Mostrar instrucciones para reactivar
-    fill(...COLORS.ORANGE);
-    textSize(24);
-    text('Haz clic en "Activar Cámara" para continuar', 0, 50);
-  }
+  } 
 
   clearDepth();
 
@@ -453,17 +392,17 @@ function createHalloweenParticles() {
   // Usar coordenadas reales detectadas por MediaPipe
   let x = mouthCenterX ;
   let y = mouthCenterY;;
-  console.log("Creando partícula en: ", x, y);
+  //console.log("Creando partícula en: ", x, y);
   
-  // Seleccionamos colores Halloween que hemos definido
-  let color = random(Object.values(COLORS));
+  // Colores Halloween definidos
+  let colorRandom = random(Object.values(COLORS));
   
   // Tamaño basado en apertura de boca
   let particleSize = map(jawOpenValue, 0, 1, 1, 25);
   let type = random(['spark', 'brush']);
   
   // Dirección basada en mouthFunnel para efectos de soplo
-  let particle = new Particle(x, y, particleSize, color, 1000, type);
+  let particle = new Particle(x, y, particleSize, colorRandom, 1000, type);
   
   particles.push(particle);
 }
@@ -504,6 +443,83 @@ function drawParticles() {
   for (let particle of particles) {
     particle.draw();
   }
+}
+// FUNCIÓN PARA DIBUJAR INTERFAZ DE USUARIO
+function drawUI() {
+   push();
+      rectMode(CENTER);
+      noStroke();
+      fill(...COLORS.WHITE);
+      rect(0, 40, newVideoWidth + 20, newVideoHeight + 100);  
+      pop();
+
+      // Dibujamos el video capturado con efecto espejo
+      push();
+      scale(-1, 1);
+      imageMode(CENTER);
+      image(capture, 0, 0, newVideoWidth, newVideoHeight);
+      pop();
+
+      push();
+      // Posicionamos donde queremos la imagen
+      translate(-width/2, -height/2 - 10);
+      imageMode(CORNER);
+      image(img, 0, 0, 400, 400 / (img.width / img.height));
+      pop();
+
+      push();
+      translate(width/2 - 200, -height/2 + 50);
+      imageMode(CORNER);
+      image(img2, 0, 0, 200, 200 / (img2.width/ img2.height));
+      pop();
+
+      push();
+      translate(-width/2 +200, height/2 - 100);
+      rotate(PI/4); // 45 grados
+      imageMode(CENTER);
+      image(img2, 0, 0, 100, 100 / (img2.width/ img2.height));
+      pop();
+
+      push();
+      translate(width/2 -410, height/2 - 370);
+      imageMode(CORNER);
+      image(img3, 0, 0, 400, 400 / (img3.width/ img3.height));
+      pop();
+
+      push();
+      translate(newVideoWidth/2, -newVideoHeight/2);
+      rotate(PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo, 0, 0, 150, 150 / (adhesivo.width / adhesivo.height));
+      pop();
+
+      push();
+      translate(-newVideoWidth/2, -newVideoHeight/2);
+      rotate(-PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo2, 0, 0, 150, 150 / (adhesivo2.width / adhesivo2.height));
+      pop();
+
+      push();
+      translate(newVideoWidth/2, newVideoHeight/2 + 100);
+      rotate(-PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo3, 0, 0, 150, 150 / (adhesivo3.width / adhesivo3.height));
+      pop();
+
+      push();
+      translate(-newVideoWidth/2, newVideoHeight/2 + 100);
+      rotate(PI/4); // 45 grados
+      imageMode(CENTER);
+      image(adhesivo3, 0, 0, 150, 150 / (adhesivo3.width / adhesivo3.height));
+      pop();
+      
+      // Aplicamos un overlay semitransparente para el efecto Halloween
+      push();
+      noStroke();
+      fill(...COLORS.BLACK, 100);
+      plane(newVideoWidth, newVideoHeight);
+      pop();
 }
 
 // Función para reposicionar botones en caso de resize
